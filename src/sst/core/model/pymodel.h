@@ -52,9 +52,6 @@ class SSTPythonModelDefinition : public SSTModelDescription {
         size_t namePrefixLen;
         std::vector<size_t> nameStack;
 
-    public:
-        std::vector<std::string> statParamKeyArray;
-        std::vector<std::string> statParamValueArray;
 
 	public:  /* Public, but private.  Called only from Python functions */
 		Config* getConfig(void) const { return config; }
@@ -80,10 +77,10 @@ class SSTPythonModelDefinition : public SSTModelDescription {
         void addStatisticOutputParameter(const char* param, const char* value) { graph->addStatisticOutputParameter(param, value); }
         void setStatisticLoadLevel(uint8_t loadLevel) { graph->setStatisticLoadLevel(loadLevel); }
 
-        void enableStatisticForComponentName(const char*  compname, const char*  statname) const { graph->enableStatisticForComponentName(compname, statname); }
+        void enableStatisticForAllComponents(const char*  statname) const { graph->enableStatisticForAllComponents(statname); }
         void enableStatisticForComponentType(const char*  comptype, const char*  statname) const  { graph->enableStatisticForComponentType(comptype, statname); }
 
-        void addStatisticParameterForComponentName(const char*  compname, const char* statname, const char* param, const char* value) { graph->addStatisticParameterForComponentName(compname, statname, param, value); }
+        void addStatisticParameterForAllComponents(const char* statname, const char* param, const char* value) { graph->addStatisticParameterForAllComponents(statname, param, value); }
         void addStatisticParameterForComponentType(const char*  comptype, const char* statname, const char* param, const char* value) { graph->addStatisticParameterForComponentType(comptype, statname, param, value); }
 };
 

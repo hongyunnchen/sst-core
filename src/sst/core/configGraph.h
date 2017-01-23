@@ -250,28 +250,27 @@ public:
 
     /** Set the statistic ouput module */
     void setStatisticOutput(const char* name);
+    const std::string& getStatOutput() const {return statOutputName;}
 
     /** Add parameter to the statistic output module */
     void addStatisticOutputParameter(const char* param, const char* value);
-
     /** Set a set of parameter to the statistic output module */
     void setStatisticOutputParams(const Params& p);
+    const Params& getStatOutputParams() const {return statOutputParams;}
 
     /** Set the statistic system load level */
     void setStatisticLoadLevel(uint8_t loadLevel);
+    long getStatLoadLevel() const {return statLoadLevel;}
 
     /** Enable a Statistics assigned to a component */
-    void enableStatisticForComponentName(std::string ComponentName, std::string statisticName);
+    void enableStatisticForAllComponents(std::string statisticName);
     void enableStatisticForComponentType(std::string ComponentType, std::string statisticName);
 
     /** Add Parameters for a Statistic */
-    void addStatisticParameterForComponentName(std::string ComponentName, std::string statisticName, const char* param, const char* value);
+    void addStatisticParameterForAllComponents(std::string statisticName, const char* param, const char* value);
     void addStatisticParameterForComponentType(std::string ComponentType, std::string statisticName, const char* param, const char* value);
-    
-    const std::string& getStatOutput() const {return statOutputName;}
-    const Params&      getStatOutputParams() const {return statOutputParams;}
-    long               getStatLoadLevel() const {return statLoadLevel;}
-    
+
+
     /** Add a Link to a Component on a given Port */
     void addLink(ComponentId_t comp_id, std::string link_name, std::string port, std::string latency_str, bool no_cut = false);
 

@@ -346,22 +346,15 @@ ConfigGraph::setStatisticLoadLevel(uint8_t loadLevel)
 }
 
 
-void 
-ConfigGraph::enableStatisticForComponentName(string ComponentName, string statisticName)
+void
+ConfigGraph::enableStatisticForAllComponents(string statisticName)
 {
-    bool found;
-
-    // Search all the components for a matching name
     for (ConfigComponentMap_t::iterator iter = comps.begin(); iter != comps.end(); ++iter) {
-        // Check to see if the names match or All components are selected
-        found = ((ComponentName == iter->name) || (ComponentName == STATALLFLAG));
-        if (true == found) {
-            iter->enableStatistic(statisticName);
-        }
+        iter->enableStatistic(statisticName);
     }
 }
 
-void 
+void
 ConfigGraph::enableStatisticForComponentType(string ComponentType, string statisticName)
 {
     bool found;
@@ -376,18 +369,11 @@ ConfigGraph::enableStatisticForComponentType(string ComponentType, string statis
     }
 }
 
-void 
-ConfigGraph::addStatisticParameterForComponentName(string ComponentName, string statisticName, const char* param, const char* value)
+void
+ConfigGraph::addStatisticParameterForAllComponents(string statisticName, const char* param, const char* value)
 {
-    bool found;
-    
-    // Search all the components for a matching name
     for (ConfigComponentMap_t::iterator iter = comps.begin(); iter != comps.end(); ++iter) {
-        // Check to see if the names match or All components are selected
-        found = ((ComponentName == iter->name) || (ComponentName == STATALLFLAG));
-        if (true == found) {
-            iter->addStatisticParameter(statisticName, param, value);
-        }
+        iter->addStatisticParameter(statisticName, param, value);
     }
 }
 
