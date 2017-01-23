@@ -19,16 +19,14 @@
 #include <vector>
 #include <map>
 #include <set>
+#include <string>
 #include <climits>
 
-#include "sst/core/sparseVectorMap.h"
-#include "sst/core/params.h"
-#include "sst/core/statapi/statoutput.h"
-#include "sst/core/rankInfo.h"
-
+#include <sst/core/sparseVectorMap.h>
+#include <sst/core/params.h>
+#include <sst/core/statapi/statoutput.h>
+#include <sst/core/rankInfo.h>
 #include <sst/core/serialization/serializable.h>
-
-// #include "sst/core/simulation.h"
 
 using namespace SST::Statistics;
 
@@ -136,20 +134,28 @@ public:
     RankInfo                      rank;              /*!< Parallel Rank for this component */
     std::vector<LinkId_t>         links;             /*!< List of links connected */
     Params                        params;            /*!< Set of Parameters */
-    bool                          isIntrospector;    /*!< Is this an Introspector? */
     std::vector<std::string>      enabledStatistics; /*!< List of statistics to be enabled */
     std::vector<Params>           enabledStatParams; /*!< List of parameters for enabled statistics */
 
     inline const ComponentId_t& key()const { return id; }
-    
+
     /** Print Component information */
     void print(std::ostream &os) const;
 
     ConfigComponent cloneWithoutLinks() const;
     ConfigComponent cloneWithoutLinksOrParams() const;
-    
+
     ~ConfigComponent() {}
     ConfigComponent() {} // for serialization
+
+    /** Add a set of Parameters to a component */
+    void addParams(Params& p);
+    /** Add a single parameter to a component */
+    void addParameter(const std::string &key, const std::string &value, bool overwrite = false);
+    /** Enable a Statistics assigned to a component */
+    void enableStatistic(std::string statisticName);
+    /** Add Parameters for a Statistic */
+    void addStatisticParameter(std::string statisticName, const char* param, const char* value);
 
     void serialize_order(SST::Core::Serialization::serializer &ser) {
         ser & id;
@@ -160,7 +166,6 @@ public:
         ser & rank.thread;
         ser & links;
         ser & params;
-        ser & isIntrospector;
         ser & enabledStatistics;
         ser & enabledStatParams;
     }
@@ -171,15 +176,13 @@ private:
 
     friend class ConfigGraph;
     /** Create a new Component */
-    ConfigComponent(ComponentId_t id, std::string name, std::string type, float weight, RankInfo rank, bool isIntrospector) :
+    ConfigComponent(ComponentId_t id, std::string name, std::string type, float weight, RankInfo rank) :
         id(id),
         name(name),
         type(type),
         weight(weight),
-        rank(rank),
-        isIntrospector(isIntrospector)
+        rank(rank)
     { }
-
 
 };
 
@@ -219,7 +222,7 @@ public:
     }
 
     size_t getNumComponents() { return comps.data.size(); }
-    
+
     /** Helper function to set all the ranks to the same value */
     void setComponentRanks(RankInfo rank);
     /** Checks to see if rank contains at least one component */
@@ -230,23 +233,24 @@ public:
 
     // API for programatic initialization
     /** Create a new component with weight and rank */
-    ComponentId_t addComponent(std::string name, std::string type, float weight, RankInfo rank);
+    ConfigComponent& addComponent(std::string name, std::string type, float weight, RankInfo rank);
     /** Create a new component */
-    ComponentId_t addComponent(std::string name, std::string type);
+    ConfigComponent& addComponent(std::string name, std::string type);
+    ConfigComponent& getComponent(ComponentId_t id) {
+        return comps[id];
+    }
+    ComponentId_t getComponentByName(const std::string &name) {
+        for ( auto i : comps ) {
+            if ( i.name == name )
+                return i.id;
+        }
+        return UNSET_COMPONENT_ID;
+    }
 
-    /** Set on which rank a Component will exist (partitioning) */
-    void setComponentRank(ComponentId_t comp_id, RankInfo rank);
-    /** Set the weight of a Component (partitioning) */
-    void setComponentWeight(ComponentId_t comp_id, float weight);
-
-    /** Add a set of Parameters to a component */
-    void addParams(ComponentId_t comp_id, Params& p);
-    /** Add a single parameter to a component */
-    void addParameter(ComponentId_t comp_id, std::string key, std::string value, bool overwrite = false);
 
     /** Set the statistic ouput module */
     void setStatisticOutput(const char* name);
-    
+
     /** Add parameter to the statistic output module */
     void addStatisticOutputParameter(const char* param, const char* value);
 
@@ -257,12 +261,10 @@ public:
     void setStatisticLoadLevel(uint8_t loadLevel);
 
     /** Enable a Statistics assigned to a component */
-    void enableComponentStatistic(ComponentId_t comp_id, std::string statisticName);
     void enableStatisticForComponentName(std::string ComponentName, std::string statisticName);
     void enableStatisticForComponentType(std::string ComponentType, std::string statisticName);
 
     /** Add Parameters for a Statistic */
-    void addComponentStatisticParameter(ComponentId_t comp_id, std::string statisticName, const char* param, const char* value);
     void addStatisticParameterForComponentName(std::string ComponentName, std::string statisticName, const char* param, const char* value);
     void addStatisticParameterForComponentType(std::string ComponentType, std::string statisticName, const char* param, const char* value);
     
@@ -272,9 +274,6 @@ public:
     
     /** Add a Link to a Component on a given Port */
     void addLink(ComponentId_t comp_id, std::string link_name, std::string port, std::string latency_str, bool no_cut = false);
-
-    /** Create a new Introspector */
-    ComponentId_t addIntrospector(std::string name, std::string type);
 
     /** Perform any post-creation cleanup processes */
     void postCreationCleanup();

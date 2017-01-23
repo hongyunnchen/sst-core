@@ -56,14 +56,6 @@ public:
      */
     Component* CreateComponent(ComponentId_t id, std::string &componentname,
                                Params& params);
-    
-    /** Attempt to create a new Introspector instantiation
-     * @param introspectorname - The fully qualified elementlibname.introspectorname type of introspector
-     * @param params - The params to pass to the introspectors's constructor
-     * @return Newly created introspector
-     */
-    Introspector* CreateIntrospector(std::string &introspectorname,
-                               Params& params);
 
     /** Ensure that an element library containing the required event is loaded
      * @param eventname - The fully qualified elementlibname.eventname type

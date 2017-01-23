@@ -51,7 +51,6 @@ class SSTPythonModelDefinition : public SSTModelDescription {
         char *namePrefix;
         size_t namePrefixLen;
         std::vector<size_t> nameStack;
-        std::map<std::string, ComponentId_t> compNameMap;
 
     public:
         std::vector<std::string> statParamKeyArray;
@@ -61,19 +60,16 @@ class SSTPythonModelDefinition : public SSTModelDescription {
 		Config* getConfig(void) const { return config; }
 		//ConfigGraph* getConfigGraph(void) const { return graph; }
 		Output* getOutput() const { return output; }
-        ComponentId_t addComponent(const char *name, const char *type) {
-            ComponentId_t id = graph->addComponent(name, type);
-            compNameMap[std::string(name)] = id;
-            return id;
+        ConfigComponent& addComponent(const char *name, const char *type) {
+            return graph->addComponent(name, type);
+        }
+        ConfigComponent& findComponent(ComponentId_t id) const {
+            return graph->getComponent(id);
         }
         ComponentId_t findComponentByName(const char *name) const {
-            auto itr = compNameMap.find(name);
-            return ( itr != compNameMap.end() ) ? itr->second : UNSET_COMPONENT_ID;
+            return graph->getComponentByName(name);
         }
-        void addParameter(ComponentId_t id, const char *name, const char *value) const { graph->addParameter(id, name, value, true); }
 
-        void setComponentRank(ComponentId_t id, uint32_t rank, uint32_t thread) const { graph->setComponentRank(id, RankInfo(rank, thread)); }
-        void setComponentWeight(ComponentId_t id, float weight) const { graph->setComponentWeight(id, weight); }
         void addLink(ComponentId_t id, const char *name, const char *port, const char *latency, bool no_cut) const {graph->addLink(id, name, port, latency, no_cut); }
 
         void pushNamePrefix(const char *name);
@@ -84,11 +80,9 @@ class SSTPythonModelDefinition : public SSTModelDescription {
         void addStatisticOutputParameter(const char* param, const char* value) { graph->addStatisticOutputParameter(param, value); }
         void setStatisticLoadLevel(uint8_t loadLevel) { graph->setStatisticLoadLevel(loadLevel); }
 
-        void enableComponentStatistic(ComponentId_t compid, const char* statname) const { graph->enableComponentStatistic(compid, statname); }
         void enableStatisticForComponentName(const char*  compname, const char*  statname) const { graph->enableStatisticForComponentName(compname, statname); }
         void enableStatisticForComponentType(const char*  comptype, const char*  statname) const  { graph->enableStatisticForComponentType(comptype, statname); }
 
-        void addComponentStatisticParameter(ComponentId_t compid, const char* statname, const char* param, const char* value) { graph->addComponentStatisticParameter(compid, statname, param, value); }
         void addStatisticParameterForComponentName(const char*  compname, const char* statname, const char* param, const char* value) { graph->addStatisticParameterForComponentName(compname, statname, param, value); }
         void addStatisticParameterForComponentType(const char*  comptype, const char* statname, const char* param, const char* value) { graph->addStatisticParameterForComponentType(comptype, statname, param, value); }
 };
