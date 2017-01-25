@@ -1007,7 +1007,7 @@ static PyMethodDef sstModuleMethods[] = {
         "Gets the number of MPI ranks currently being used to run SST" },
     {   "setThreadCount",
         setSSTThreadCount, METH_O,
-        "Gets the number of MPI ranks currently being used to run SST" },
+        "Sets the number of threads expected to be used to run SST" },
     {   "setStatisticOutput",
         setStatisticOutput, METH_VARARGS,
         "Sets the Statistic Output - default is console output." },
